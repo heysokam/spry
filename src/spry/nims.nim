@@ -8,7 +8,7 @@ when not defined(nimscript) or not defined(nimspry):
 from std/os import `/`, splitFile
 from std/strformat import `&`
 from std/strutils import join
-from std/sets import HashSet, incl, items
+from std/sets import HashSet, incl, items, len
 from std/sequtils import toSeq
 
 
@@ -51,11 +51,12 @@ proc dbg *(args :varargs[string,`$`]) :void=
 #_________________________________________________
 # @section Nim tools
 #_____________________________
-var deps :HashSet[string]
+var deps {.global, threadvar.}:HashSet[string]
 proc nim  *(opts :varargs[string,`$`]) :void=  exec nimBin&" "&opts.join(" ")
 proc nimc *(opts :varargs[string,`$`]) :void=
   if not fileExists(binDir/".gitignore"): writeFile(binDir/".gitignore", "*\n!.gitignore")
-  let paths :string= "--path:" & deps.toSeq.join(" --path:")
+  let paths :string= if deps.len > 0: "--path:" & deps.toSeq.join(" --path:") else: ""
+  for it in deps: echo it
   nim &"c --outDir:{binDir} {paths} "&opts.join(" ")
 proc nimInstall (vers :string= nimVer) :void=
   if nimDir.dirExists: return
@@ -68,11 +69,12 @@ proc nimInstall (vers :string= nimVer) :void=
 #_________________________________________________
 # @section Dependency management
 #_____________________________
-proc require *(name :string; url :string= ""; shallow :bool= true) :void=
+proc require *(name :string; url :string= ""; code :string= "src"; shallow :bool= true) :void=
   case name
   of "nim","nim stable", "nim latest" : nimInstall()        ; return
   of "nim devel"                      : nimInstall "devel"  ; return
-  deps.incl url
+  else:discard
+  deps.incl libDir/name/code
   if not fileExists(libDir/".gitignore") : writeFile(libDir/".gitignore", "*\n!.gitignore")
   if not dirExists(libDir/name)          : git "clone", &"{url} {libDir/name}", if shallow: " --depth 1" else: ""
 

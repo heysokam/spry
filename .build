@@ -1,2 +1,2 @@
 #!/bin/sh
-./bin/.nim/bin/nim -d:nimspry --hints:off spry.nims
+./bin/.nim/bin/nim -d:nimspry --hints:off --skipParentCfg -d:run spry.nims

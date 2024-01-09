@@ -5,4 +5,8 @@ license     = "LGPL-3.0-or-later"
 include ./src/spry/nims
 # @section Dependencies
 require "nim"
-require "nimscripter", "https://github.com/beef331/nimscripter#head"
+require "assume", "https://github.com/disruptek/assume", ""
+require "nimscripter", "https://github.com/beef331/nimscripter"
+
+when defined(run)   : runTask()
+when defined(build) : buildTask()
