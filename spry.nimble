@@ -9,3 +9,4 @@ binDir        = "bin"
 bin           = @[packageName]
 # Dependencies
 requires "nim >= 2.0.2"
+requires "https://github.com/beef331/nimscripter#head"
