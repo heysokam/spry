@@ -15,6 +15,8 @@
 - [ ] Commands
   - [ ] Replace nim
     - [ ] c, cpp, js
+  - [ ] Replace nimble
+    - [ ] build, run
   - [ ] doc
   - [ ] init
   - [ ] create [minc,nim,c,cpp]
