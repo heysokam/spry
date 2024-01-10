@@ -1,6 +1,7 @@
 # ᛊ spry | Nimble, brisk and lively package manager ❣
 ```md
 # TODO
+- [ ] YAML config file
 - [ ] Make output binary executable
 - [ ] Build Mode
 - [ ] zigcc
@@ -14,10 +15,20 @@
   - [ ] File modification get/write
 - [ ] Commands
   - [ ] Replace nim
-    - [ ] c, cpp, js
+    - [ ] c
+    - [ ] cpp
+    - [ ] js
   - [ ] Replace nimble
-    - [ ] build, run
+    - [ ] build (confy)
+    - [ ] run
+  - [ ] any
   - [ ] doc
   - [ ] init
-  - [ ] create [minc,nim,c,cpp]
+    - [ ] nim
+    - [ ] minc
+  - [ ] create
+    - [ ] minc
+    - [ ] nim
+    - [ ] c
+    - [ ] cpp
 ```
