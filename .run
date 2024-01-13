@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+set -u
+thisDir=$(dirname "$(realpath "$BASH_SOURCE")")
+$thisDir/.build
+exec $thisDir/bin/spry "$@"

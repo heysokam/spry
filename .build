@@ -1,2 +1,6 @@
-#!/bin/sh
-./bin/.nim/bin/nim -d:nimspry --hints:off --skipParentCfg -d:run spry.nims
+#!/bin/bash
+set -e
+set -u
+thisDir=$(dirname "$(realpath "$BASH_SOURCE")")
+$thisDir/bin/.nim/bin/nim -d:nimspry --hints:off --skipParentCfg -d:build spry.nims
+$thisDir/bin/build

@@ -3,9 +3,8 @@
 #_____________________________
 when not defined(nimscript) or not defined(nimspry):
   {.error: "This file can only be included/imported into a nimscript or spry configuration file".}
-
 # @deps std
-from std/os import `/`, splitFile
+from std/os import `/`, absolutePath, parentDir
 from std/strformat import `&`
 from std/strutils import join
 from std/sets import HashSet, incl, items, len
@@ -13,27 +12,27 @@ from std/sequtils import toSeq
 
 
 #_________________________________________________
-# @section Sane project defaults
+# @section Caller Script Configuration
 #_____________________________
-# Default nimscript
+let rootDir = absolutePath( currentSourcePath().parentDir()/".."/".." )
 packageName = projectName()
-version     = "0.0.0"
-srcDir      = "src"
-binDir      = "bin"
-bin         = if packageName != "": @[packageName] else: @[]
+srcDir      = rootDir/"src"
+binDir      = rootDir/"bin"
+bin         = @["build"]
+let libDir  = srcDir/"lib"
+version     = if version != "": version else:"0.0.0"  # Only used for the builder
+
+#_________________________________________________
+# @section Helpers Configuration
 #_____________________________
-# spry nimscript extensions
 when not declared(verbose):
-  var verbose * = off
-var prefix  * = packageName&": "
-var libDir  * = srcDir/"lib"
-var nimURL  * = "https://github.com/nim-lang/Nim"
-var nimVer  * = "version-2-0"
-var nimDir  * = binDir/".nim"
-var nimBin  * = nimDir/"bin"/"nim"
-var zigDir  * = binDir/".zig"
-var zigBin  * = nimDir/"zig"
-var gitBin  * = "git"
+  var verbose = on 
+var prefix  = "spry: "
+var nimURL  = "https://github.com/nim-lang/Nim"
+var nimVer  = "version-2-0"
+var nimDir  = binDir/".nim"
+var nimBin  = nimDir/"bin"/"nim"
+var gitBin  = "git"
 
 #_________________________________________________
 # @section Shell tools
@@ -46,17 +45,17 @@ proc git *(args :varargs[string,`$`]) :void= sh gitBin, args.join(" ")
 proc info *(args :varargs[string,`$`]) :void= echo prefix & args.join(" ")
 proc dbg *(args :varargs[string,`$`]) :void=
   if verbose: info args.join(" ")
-
-
 #_________________________________________________
 # @section Nim tools
 #_____________________________
 var deps {.global, threadvar.}:HashSet[string]
-proc nim  *(opts :varargs[string,`$`]) :void=  exec nimBin&" "&opts.join(" ")
+proc nim  *(opts :varargs[string,`$`]) :void=
+  let cmd = nimBin&" "&opts.join(" ")
+  dbg "Running nim with command:\n  ",cmd
+  exec cmd
 proc nimc *(opts :varargs[string,`$`]) :void=
   if not fileExists(binDir/".gitignore"): writeFile(binDir/".gitignore", "*\n!.gitignore")
   let paths :string= if deps.len > 0: "--path:" & deps.toSeq.join(" --path:") else: ""
-  for it in deps: echo it
   nim &"c --outDir:{binDir} {paths} "&opts.join(" ")
 proc nimInstall (vers :string= nimVer) :void=
   if nimDir.dirExists: return
@@ -65,42 +64,29 @@ proc nimInstall (vers :string= nimVer) :void=
   withDir nimDir: sh "./build_all.sh"
   info "Done installing nim."
 
-
 #_________________________________________________
-# @section Dependency management
+# @section Dependency Management
 #_____________________________
 proc require *(name :string; url :string= ""; code :string= "src"; shallow :bool= true) :void=
   case name
   of "nim","nim stable", "nim latest" : nimInstall()        ; return
   of "nim devel"                      : nimInstall "devel"  ; return
   else:discard
-  deps.incl libDir/name/code
+  deps.incl absolutePath( libDir/name/code )
   if not fileExists(libDir/".gitignore") : writeFile(libDir/".gitignore", "*\n!.gitignore")
   if not dirExists(libDir/name)          : git "clone", &"{url} {libDir/name}", if shallow: " --depth 1" else: ""
 
 
 #_________________________________________________
-# @section Overridable buildsystem tasks
+# @section Buildsystem Initialization task
 #_____________________________
 # Build task default
-when not declared(beforeBuild):
-  template beforeBuild= discard
-when not declared(afterBuild):
-  template afterBuild= discard
-when not declared(buildTask):
-  task build, &"Build {packageName}":
-    beforeBuild()
-    for it in bin: nimc &"{srcDir/it}"
-    afterBuild()
-#_____________________________
-# Run task default
-when not declared(beforeRun):
-  template beforeRun= discard
-when not declared(afterRun):
-  template afterRun= discard
-when not declared(runTask):
-  task run, &"Build and run {packageName}":
-    beforeRun()
-    for it in bin: nimc &"-r {srcDir/it}"
-    afterRun()
+template beforeBuild=
+  info &"Starting to build the confy.Builder for {packageName} v{version} ..."
+template afterBuild=
+  info &"Done building the {packageName}'s confy.Builder."
+proc build=
+  beforeBuild()
+  for it in bin: nimc &"{srcDir/it}"
+  afterBuild()
 

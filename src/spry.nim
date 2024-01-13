@@ -1,3 +1,7 @@
 import nimscripter
 import confy
-when isMainModule: echo "spry"
+import nstd/opts
+
+when isMainModule:
+  let cli = opts.getCLI()
+  echo "spry"
