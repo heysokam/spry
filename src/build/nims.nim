@@ -56,7 +56,8 @@ proc nim  *(opts :varargs[string,`$`]) :void=
 proc nimc *(opts :varargs[string,`$`]) :void=
   if not fileExists(binDir/".gitignore"): writeFile(binDir/".gitignore", "*\n!.gitignore")
   let paths :string= if deps.len > 0: "--path:" & deps.toSeq.join(" --path:") else: ""
-  nim &"c --outDir:{binDir} {paths} "&opts.join(" ")
+  let mode = when defined(release): "-d:release" elif defined(danger): "-d:danger" else: "-d:debug"
+  nim &"c {mode} --hints:off --outDir:{binDir} {paths} "&opts.join(" ")
 proc nimInstall (vers :string= nimVer) :void=
   if nimDir.dirExists: return
   info "Installing nim",vers
