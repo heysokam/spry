@@ -1,0 +1,13 @@
+dir:
+  root:
+    sub        : "."
+    relativeTo : "."
+  src:
+    sub        : "src"
+    relativeTo : "ROOT"
+  bin:
+    sub        : "bin"
+    relativeTo : "ROOT"
+  lib:
+    sub        : "lib"
+    relativeTo : "SRC"
