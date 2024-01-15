@@ -17,6 +17,7 @@ const Known :CmdList= [
   Cmd(id:"nimble"   , kind:Passthrough),
   Cmd(id:"minc"     , kind:Passthrough),
   Cmd(id:"any"      , kind:Compile),
+  Cmd(id:"init"     , kind:Keyword), # Search for srcDir/init.nim and run it
   Cmd(id:"build"    , kind:Keyword), # Search for srcDir/build.nim and run it
   Cmd(id:"tests"    , kind:Keyword), # Search for srcDir/tests.nim and run it
   Cmd(id:"example"  , kind:Keyword), # Search for srcDir/examples.nim and run it with the given trg
@@ -25,6 +26,7 @@ const Known :CmdList= [
   # else: Search for srcDir/clean.nim and run it
   #     : build, tests, examples
   ].toHashSet # << cmds.Known
+  # TODO: push & tag : https://github.com/beef331/graffiti/blob/master/src/graffiti.nim
 #___________________
 func isKnown *(id :string) :bool= id in Known
 func isKnown *(cli :opts.CLI) :bool= cli.args[0].isKnown

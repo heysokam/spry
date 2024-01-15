@@ -1,8 +1,9 @@
 import confy
 
-cfg.verbose = off
-cfg.quiet   = on
-cfg.libDir  = cfg.srcDir/"lib"
+cfg.verbose       = off
+cfg.quiet         = on
+cfg.libDir        = cfg.srcDir/"lib"
+cfg.nim.systemBin = off
 
 build Program.new(
   src  = srcDir/"spry.nim",

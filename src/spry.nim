@@ -22,6 +22,10 @@ import ./spry/cmds
 type SpryRunError * = object of CatchableError
 proc err (args :varargs[string, `$`]) :void=  l.fatal( args.join(" ") ); quit(142)
 
+# @section MinC Managemen.
+#  TODO: Move to confy
+proc mincGetRealBin :Path=
+  if cfg.mincDir.dirExists: cfg.mincDir/"bin"/"minc" else: Path"minc"
 
 # @section Entry Point Logic
 proc run (cli :opts.CLI) :void=
@@ -35,7 +39,7 @@ proc run (cli :opts.CLI) :void=
       of "nim"    : nim.getRealBin & args
       of "nimble" : nim.getRealNimble & args
       of "zig"    : zig.getRealBin & args
-      of "minc"   : "minc "&args
+      of "minc"   : mincGetRealBin().string & args
       else:""
   of Keyword:
     # This section is technically a generic build.nim file
@@ -59,10 +63,12 @@ proc run (cli :opts.CLI) :void=
 # @section Entry Point
 when isMainModule:
   # Initialize Confy configuration
-  cfg.rootDir = getCurrentDir()
-  cfg.srcDir  = cfg.rootDir/"src"
-  cfg.binDir  = cfg.rootDir/"bin"
-  cfg.libDir  = cfg.binDir/".lib"  # Hide libDir inside binDir for confy
+  cfg.rootDir       = getCurrentDir()
+  cfg.srcDir        = cfg.rootDir/"src"
+  cfg.binDir        = cfg.rootDir/"bin"
+  cfg.libDir        = cfg.binDir/".lib"  # Hide libDir inside binDir for confy
+  cfg.mincDir       = cfg.binDir/".minc"
+  cfg.nim.systemBin = off
   # Run the process
   let cli = opts.getCLI()
   cli.run()
