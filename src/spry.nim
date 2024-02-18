@@ -36,9 +36,9 @@ proc run (cli :opts.CLI) :void=
   case cmds.getFrom(cli).kind
   of Passthrough:
     cmd = case cli.args[0]
-      of "nim"    : nim.getRealBin & args
-      of "nimble" : nim.getRealNimble & args
-      of "zig"    : zig.getRealBin & args
+      of "nim"    : nim.getRealBin() & args
+      of "nimble" : nim.getRealNimble() & args
+      of "zig"    : zig.getRealBin() & args
       of "minc"   : mincGetRealBin().string & args
       else:""
   of Keyword:
