@@ -22,7 +22,7 @@ import ./spry/cmds
 type SpryRunError * = object of CatchableError
 proc err (args :varargs[string, `$`]) :void=  l.fatal( args.join(" ") ); quit(142)
 
-# @section MinC Managemen.
+# @section MinC Management
 #  TODO: Move to confy
 proc mincGetRealBin :Path=
   if cfg.mincDir.dirExists: cfg.mincDir/"bin"/"minc" else: Path"minc"
